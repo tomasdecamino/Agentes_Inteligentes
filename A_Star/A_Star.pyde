@@ -125,7 +125,9 @@ def astar(maze, start, end):
 
             # Add the child to the open list
             open_list.append(child)
-
+            
+            
+###################### Main ################
 # x & y are inverted in array with respect to canvas
 env = Environment(
         [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -139,13 +141,14 @@ env = Environment(
         [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
 
+#Global variables
 start = (0, 0)
 end = (2, 6)
 path = astar(env.maze, start, end)
-print(path)
+
 
 def setup():
-    size(300,300)
+    size(600,600)
     ellipseMode(CORNER)
 
 def draw():
@@ -159,3 +162,21 @@ def draw():
     #end position
     fill(color(255,0,10))
     circle(path[-1][1]*s,path[-1][0]*s,s)
+    
+def mousePressed():
+    global end
+    global env
+    global path
+    global start 
+    if mouseButton == LEFT:
+        newY=int(mouseY*env.scale//height)
+        newX=int(mouseX*env.scale//width)
+        end = (newY,newX)
+        print(end)
+        path = astar(env.maze, start, end)
+
+    if mouseButton == RIGHT:
+        newY=int(mouseY*env.scale//height)
+        newX=int(mouseX*env.scale//width)
+        start = (newY,newX)
+        path = astar(env.maze, start, end)
