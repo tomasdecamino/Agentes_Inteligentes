@@ -4,9 +4,9 @@
 #based on seudocode in wikipedia
 
 class Environment:
-  def __init__(self,maze):
+  def __init__(self,w,maze):
       self.maze= maze
-      self.scale = len(maze) #assumes square array
+      self.scale = w/len(maze) #assumes square array
 
   def setcolor(self,value):
     switch = {
@@ -17,17 +17,19 @@ class Environment:
     return switch.get(value,0)
 
   def display(self,w):
-    s=w/self.scale
     for i, row in enumerate(self.maze):
         for j,col  in enumerate(row):
             fill(self.setcolor(col))
-            rect(j*s,i*s,s,s)
+            rect(j*self.scale,i*self.scale,self.scale,self.scale)
 
   def displayPath(self,w,path):
-      s=w/self.scale
       for pos in path:
           fill(self.setcolor(2))
-          rect(pos[1] * s,pos[0]* s,s,s)
+          rect(pos[1] * self.scale,pos[0]* self.scale,self.scale,self.scale)
+          
+  def drawCircle(self, x,y,c):
+          fill(c)
+          circle(x*self.scale,y*self.scale,self.scale)
 
 
 class Node():
@@ -129,7 +131,18 @@ def astar(maze, start, end):
             
 ###################### Main ################
 # x & y are inverted in array with respect to canvas
-env = Environment(
+
+
+#Global variables
+start = (0, 0)
+end = (2, 6)
+
+
+def setup():
+    size(600,600)
+    ellipseMode(CORNER)
+    global env
+    env = Environment(width,
         [[0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
@@ -140,16 +153,8 @@ env = Environment(
         [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-
-#Global variables
-start = (0, 0)
-end = (2, 6)
-path = astar(env.maze, start, end)
-
-
-def setup():
-    size(600,600)
-    ellipseMode(CORNER)
+    global path
+    path = astar(env.maze, start, end)
 
 def draw():
     background(255)
@@ -157,11 +162,9 @@ def draw():
     env.displayPath(width,path)
     s = width/env.scale
     #start position
-    fill(color(0,0,255))
-    circle(start[1]*s,start[0]*s,s)
+    env.drawCircle(start[1],start[0],color(0,0,255))
     #end position
-    fill(color(255,0,10))
-    circle(path[-1][1]*s,path[-1][0]*s,s)
+    env.drawCircle(path[-1][1],path[-1][0],color(255,0,0))
     
 def mousePressed():
     global end
@@ -169,14 +172,14 @@ def mousePressed():
     global path
     global start 
     if mouseButton == LEFT:
-        newY=int(mouseY*env.scale//height)
-        newX=int(mouseX*env.scale//width)
+        newY=int(mouseY//env.scale)
+        newX=int(mouseX//env.scale)
         end = (newY,newX)
         print(end)
         path = astar(env.maze, start, end)
 
     if mouseButton == RIGHT:
-        newY=int(mouseY*env.scale//height)
-        newX=int(mouseX*env.scale//width)
+        newY=int(mouseY//env.scale)
+        newX=int(mouseX//env.scale)
         start = (newY,newX)
         path = astar(env.maze, start, end)
